@@ -11,16 +11,27 @@ import androidx.recyclerview.widget.RecyclerView
 
 class contactListAdapter:
     ListAdapter<Contact, contactListAdapter.ContactViewHolder>(ContactDiffUtils()) {
-        class ContactViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+       private lateinit var onClickListener:(Contact)-> Unit
+        class ContactViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
             private val tvName = view.findViewById<TextView>(R.id.tv_name)
             private val tvPhone = view.findViewById<TextView>(R.id.tv_phone)
             private val image = view.findViewById<ImageView>(R.id.imageView)
-            fun bind(contact: Contact){
-                tvName.text= contact.name
+
+            fun bind(contact: Contact, onClick: (Contact) -> Unit) {
+                tvName.text = contact.name
                 tvPhone.text = contact.phone
                 image.setImageResource(contact.icon)
+
+                view.setOnClickListener {
+                    onClick.invoke(contact)
+                }
             }
+
         }
+    fun setOnClickListener(onClick:(Contact)-> Unit){
+        onClickListener = onClick
+    }
     class ContactDiffUtils: DiffUtil.ItemCallback<Contact>(){
         override fun areItemsTheSame(oldItem: Contact, newItem: Contact): Boolean {
             return oldItem == newItem
@@ -38,6 +49,6 @@ class contactListAdapter:
     }
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = getItem(position)
-      holder.bind(contact)
+      holder.bind(contact, onClickListener)
     }
 }
